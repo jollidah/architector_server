@@ -1,74 +1,199 @@
-from pydantic import BaseModel
-from typing import List, Optional, Literal
+from pydantic import BaseModel, Field
+from typing import List, Union, Literal, Annotated
+from enum import Enum
 
-
-class UserInput(BaseModel):
-    service_type: str
-    computing_service_model: str
+class InstanceRequirements(BaseModel):
     target_stability: str
     anticipated_rps: int
     requirements_for_data_processing: str
+
+class UserInput(BaseModel):
+    location: str
+    service_type: str
+    computing_service_model: str
     additional_requirements: str
+    instance_requirements: List[InstanceRequirements]
 
-class VultrInstance(BaseModel):
+class ArchitectureItem(BaseModel):
+    description: str
+
+class EvalRecommandedArchitecture(BaseModel):
+    rec1: ArchitectureItem
+    rec2: ArchitectureItem
+    rec3: ArchitectureItem
+
+# ENUM 정의
+class BackupStatus(str, Enum):
+    enabled = "enabled"
+    disabled = "disabled"
+
+class IpType(str, Enum):
+    v4 = "v4"
+    v6 = "v6"
+
+class Protocol(str, Enum):
+    icmp = "icmp"
+    tcp = "tcp"
+    udp = "udp"
+    gre = "gre"
+    esp = "esp"
+    ah = "ah"
+
+class DatabaseEngine(str, Enum):
+    mysql = "mysql"
+    pg = "pg"
+
+
+# 각 Command의 data 스키마 정의
+class CreateInstanceData(BaseModel):
+    region: str
     plan: str
-    region: str
+    label: str
     os_id: int
-    label: str
-    ssh_key_ids: List[str]
-    tags: List[str]
-    vpc_id: Optional[str] = None
+    backups: BackupStatus
+    hostname: str
 
-class VultrVPC(BaseModel):
-    region: str
-    label: str
-    v4_subnet: str
-    v4_subnet_mask: int
-
-class VultrObjectStorage(BaseModel):
-    cluster_id: int
-    region: str
+class UpdateInstanceData(BaseModel):
+    id: str
+    backups: BackupStatus
+    firewall_group_id: str
+    os_id: int
+    plan: str
+    ddos_protection: bool
     label: str
 
-class VultrBlockStorage(BaseModel):
+class CreateBlockStorageData(BaseModel):
     region: str
     size_gb: int
     label: str
-    attached_to_instance: str
 
+class UpdateBlockStorageData(BaseModel):
+    id: str
+    size_gb: int
+    label: str
+    
+class AttachBlockStorageToInstance(BaseModel):
+  id: str
+  instance_id: str
+  live: bool 
 
-class VultrDatabase(BaseModel):
-    database_engine: Literal["mysql", "pg", "valkey", "kafka"]
-    database_engine_version: str
+class CreateFirewallGroupData(BaseModel):
+    description: str
+
+class UpdateFirewallGroupData(BaseModel):
+    id: str
+    description: str
+
+class CreateFirewallRuleData(BaseModel):
+    fire_wall_group_id: str
+    ip_type: IpType
+    protocol: Protocol
+    port: str
+    subnet: str
+    subnet_size: int
+    notes: str
+
+class CreateManagedDatabaseData(BaseModel):
+    database_engine: DatabaseEngine
+    database_engine_version: int
     region: str
     plan: str
     label: str
-    trusted_ips: List[str]
-    vpc_id: Optional[str] = None
 
-class Connection(BaseModel):
-    from_: str
-    to: str
-    type: str
+class UpdateManagedDatabaseData(BaseModel):
+    id: str
+    plan: str
+    label: str
 
-class Resources(BaseModel):
-    vultr_instance: Optional[List[VultrInstance]] = []
-    vultr_vpc: Optional[List[VultrVPC]] = []
-    vultr_object_storage: Optional[List[VultrObjectStorage]] = []
-    vultr_block_storage: Optional[List[VultrBlockStorage]] = []
-    vultr_database: Optional[List[VultrDatabase]] = []
+class CreateObjectStorageData(BaseModel):
+    cluster_id: int
+    tier_id: int
+    label: str
 
-class TerraformInput(BaseModel):
-    version: str
-    environment: str
-    resources: Resources
-    connections: List[Connection]
-    
-class ArchitectureResponse(BaseModel):
-    version: str
-    environment: str
-    resources: dict
-    connections: list
+class UpdateObjectStorageData(BaseModel):
+    id: str
+    label: str
 
-class TerraformResponse(BaseModel):
-    terraform_code: str
+# Discriminated Union으로 command_name 구분
+class CreateInstance(BaseModel):
+    command_name: Literal["CreateInstance"]
+    tmp_id: str
+    data: CreateInstanceData
+
+class UpdateInstance(BaseModel):
+    command_name: Literal["UpdateInstance"]
+    data: UpdateInstanceData
+
+class CreateBlockStorage(BaseModel):
+    command_name: Literal["CreateBlockStorage"]
+    tmp_id: str
+    data: CreateBlockStorageData
+
+class UpdateBlockStorage(BaseModel):
+    command_name: Literal["UpdateBlockStorage"]
+    data: UpdateBlockStorageData
+
+class AttachBlockStorageToInstance(BaseModel):
+    command_name: Literal["AttachBlockStorageToInstance"]
+    data: AttachBlockStorageToInstance
+
+class CreateFirewallGroup(BaseModel):
+    command_name: Literal["CreateFirewallGroup"]
+    tmp_id: str
+    data: CreateFirewallGroupData
+
+class UpdateFirewallGroup(BaseModel):
+    command_name: Literal["UpdateFirewallGroup"]
+    data: UpdateFirewallGroupData
+
+class CreateFirewallRule(BaseModel):
+    command_name: Literal["CreateFirewallRule"]
+    data: CreateFirewallRuleData
+
+class CreateManagedDatabase(BaseModel):
+    command_name: Literal["CreateManagedDatabase"]
+    tmp_id: str
+    data: CreateManagedDatabaseData
+
+class UpdateManagedDatabase(BaseModel):
+    command_name: Literal["UpdateManagedDatabase"]
+    data: UpdateManagedDatabaseData
+
+class CreateObjectStorage(BaseModel):
+    command_name: Literal["CreateObjectStorage"]
+    tmp_id: str
+    data: CreateObjectStorageData
+
+class UpdateObjectStorage(BaseModel):
+    command_name: Literal["UpdateObjectStorage"]
+    data: UpdateObjectStorageData
+
+
+
+CommandUnion = Annotated[
+    Union[
+    CreateInstance,
+    UpdateInstance,
+    CreateBlockStorage,
+    UpdateBlockStorage,
+    AttachBlockStorageToInstance,
+    CreateFirewallGroup,
+    UpdateFirewallGroup,
+    CreateFirewallRule,
+    CreateManagedDatabase,
+    UpdateManagedDatabase,
+    CreateObjectStorage,
+    UpdateObjectStorage
+    ],
+    Field(discriminator='command_name')
+]
+
+
+# 최종 요청 스키마
+class CommandRequest(BaseModel):
+    command_list: List[CommandUnion]
+
+class FinalArchitectureResponse(BaseModel):
+    rec1: CommandRequest
+    rec2: CommandRequest
+    rec3: CommandRequest

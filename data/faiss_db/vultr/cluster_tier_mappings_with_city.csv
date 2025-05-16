@@ -1,0 +1,31 @@
+cluster_id,tier_id,sales_name,ratelimit_ops_secs,ratelimit_ops_bytes,price,disk_gb_price,bw_gb_price,city
+2,2,Standard,800,629145600,18,0.018,0.01,New Jersey
+4,2,Standard,800,629145600,18,0.018,0.01,Singapore
+5,2,Standard,800,629145600,18,0.018,0.01,Silicon Valley
+6,2,Standard,800,629145600,18,0.018,0.01,Amsterdam
+7,2,Standard,800,629145600,18,0.018,0.01,Bangalore
+8,2,Standard,800,629145600,18,0.018,0.01,Delhi NCR
+2,3,Premium,1000,838860800,36,0.036,0.01,New Jersey
+4,3,Premium,1000,838860800,36,0.036,0.01,Singapore
+5,3,Premium,1000,838860800,36,0.036,0.01,Silicon Valley
+6,3,Premium,1000,838860800,36,0.036,0.01,Amsterdam
+7,3,Premium,1000,838860800,36,0.036,0.01,Bangalore
+8,3,Premium,1000,838860800,36,0.036,0.01,Delhi NCR
+9,4,Performance,4000,1048576000,50,0.05,0.01,New Jersey
+10,4,Performance,4000,1048576000,50,0.05,0.01,Chicago
+11,4,Performance,4000,1048576000,50,0.05,0.01,Los Angeles
+12,4,Performance,4000,1048576000,50,0.05,0.01,Amsterdam
+13,4,Performance,4000,1048576000,50,0.05,0.01,Sydney
+14,4,Performance,4000,1048576000,50,0.05,0.01,London
+15,4,Performance,4000,1048576000,50,0.05,0.01,Singapore
+16,4,Performance,4000,1048576000,50,0.05,0.01,Tokyo
+17,4,Performance,4000,1048576000,50,0.05,0.01,Bangalore
+9,5,Accelerated,10000,5242880000,100,0.1,0.01,New Jersey
+10,5,Accelerated,10000,5242880000,100,0.1,0.01,Chicago
+11,5,Accelerated,10000,5242880000,100,0.1,0.01,Los Angeles
+12,5,Accelerated,10000,5242880000,100,0.1,0.01,Amsterdam
+13,5,Accelerated,10000,5242880000,100,0.1,0.01,Sydney
+14,5,Accelerated,10000,5242880000,100,0.1,0.01,London
+15,5,Accelerated,10000,5242880000,100,0.1,0.01,Singapore
+16,5,Accelerated,10000,5242880000,100,0.1,0.01,Tokyo
+17,5,Accelerated,10000,5242880000,100,0.1,0.01,Bangalore
