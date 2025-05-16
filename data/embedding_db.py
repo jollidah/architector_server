@@ -49,7 +49,6 @@ def load_and_preprocess_csv(file_path):
     return documents
 
 
-# 여러 개의 CSV 파일을 로드
 files = [
     "faiss_db/vultr/Filtered_DBaaS_Plans.csv",
 ]

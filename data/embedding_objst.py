@@ -11,8 +11,6 @@ load_dotenv()
 
 openai_api_key = os.getenv("OPENAI_API_KEY")
 
-# cluster_id,tier_id,sales_name,ratelimit_ops_secs,ratelimit_ops_bytes,price,disk_gb_price,bw_gb_price,city
-
 def load_and_preprocess_csv(file_path):
     df = pd.read_csv(file_path)
     documents = []
@@ -42,7 +40,6 @@ def load_and_preprocess_csv(file_path):
     return documents
 
 
-# 여러 개의 CSV 파일을 로드
 files = [
     "faiss_db/vultr/cluster_tier_mappings_with_city.csv",
 ]

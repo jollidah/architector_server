@@ -4,13 +4,6 @@ from app.models.schemas import UserInput, FinalArchitectureResponse, EvalRecomma
 
 router = APIRouter()
 
-# @router.post("/v1/internal/architecture", response_model=FinalArchitectureResponse)
-# def recommend_multiple_architectures(req: UserInput):
-#     llm1_result = run_chain1(req.model_dump())
-#     location = req.location
-#     final_architecture = run_chain2(llm1_result, location=location)
-#     return final_architecture
-
 @router.post("/v1/internal/architecture", response_model=FinalArchitectureResponse)
 def recommend_multiple_architectures(req: UserInput):
     llm1_result = run_chain1(req.model_dump())

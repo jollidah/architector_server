@@ -14,7 +14,7 @@ def sparse_from_documents(documents: List[Document], user_location=None, k: int 
         
         # fallback: 아무 문서도 없으면 전체 문서 사용
         if not filtered_documents:
-            print(f"[WARN] No documents matched user_location='{user_location}'. Using all documents.")
+            # print(f"[WARN] No documents matched user_location='{user_location}'. Using all documents.")
             filtered_documents = documents
     else:
         filtered_documents = documents
@@ -22,29 +22,6 @@ def sparse_from_documents(documents: List[Document], user_location=None, k: int 
     retriever = BM25Retriever.from_documents(filtered_documents)
     retriever.k = k
     return retriever
-
-
-
-# def hybrid_retrieve(query: str, query_location: str, dense_retriever, sparse_retriever, alpha=0.5, k=3):    
-#     dense_results = dense_retriever.similarity_search_with_score(query, k=k)
-#     sparse_results = sparse_retriever.invoke(query)
-
-#     combined_scores = defaultdict(float)
-#     doc_map = {}
-
-#     for doc, score in dense_results:
-#         key = doc.page_content
-#         combined_scores[key] += alpha * (1 - score)
-#         doc_map[key] = doc
-
-#     for doc in sparse_results:
-#         key = doc.page_content
-#         combined_scores[key] += (1 - alpha)
-#         doc_map[key] = doc
-
-#     top_docs = sorted(combined_scores.items(), key=lambda x: x[1], reverse=True)[:k]
-#     return [doc_map[doc_text] for doc_text, _ in top_docs]
-
 
 def hybrid_retrieve(query: str, dense_retriever, sparse_retriever, user_location=None, alpha=0.5, k=3):
     def is_location_matched(doc):

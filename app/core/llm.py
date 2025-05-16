@@ -22,7 +22,6 @@ def run_chain1(user_input: Dict[str, Any], retries: int = 3):
     raw_response = chain.invoke({"user_input": json.dumps(user_input, ensure_ascii=False)})
     json_blocks = re.findall(r'```json\s*([\s\S]*?)```', raw_response)
 
-    print(raw_response)
     
     spec, db_spec, object_storage_spec = {}, {}, {}
 
@@ -43,10 +42,7 @@ def run_chain1(user_input: Dict[str, Any], retries: int = 3):
             object_storage_spec = json.loads(clean_json_string(json_blocks[2]))
         except json.JSONDecodeError as e:
             print("object_storage_spec JSON 파싱 오류:", e)
-            
-    # print(spec)
-    # print(db_spec)
-    
+
     if not isinstance(spec, list):
         spec = [spec]
     
@@ -79,8 +75,6 @@ def process_instance_specifications(instance_specs: list, location: str,
 
         top3 = raw_response["Recommended_Instances"]
         all_top3_per_spec.append(top3)
-        # print(top3)
-        # print(all_top3_per_spec)
 
     return all_top3_per_spec
 
@@ -142,9 +136,6 @@ def run_chain2(llm1_result: dict, location: str) -> dict:
 
         db_rec = raw_response["DB_plan"]
         db_plans.append(db_rec)
-        
-    print(all_top3_per_spec)
-    print(db_plans)
 
     return {
         "instance_plans": transposed_plans,
@@ -177,7 +168,7 @@ def run_chain3(user_input: Dict[str, Any], llm1_result: dict, llm2_result: dict,
         "content": json.loads(doc.page_content)
     }, ensure_ascii=False) for doc in object_storage_context_docs]    
     
-    print(context)
+    # print(context)
     recs = []
 
     for i in range(3):
@@ -195,7 +186,6 @@ def run_chain3(user_input: Dict[str, Any], llm1_result: dict, llm2_result: dict,
 
         rec = CommandRequest(**raw_response)
         recs.append(rec)
-        print(raw_response)
 
     return FinalArchitectureResponse(
         rec1=recs[0],
