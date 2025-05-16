@@ -24,7 +24,7 @@ def run_chain1(user_input: Dict[str, Any], retries: int = 3):
 
     print(raw_response)
     
-    spec, db_spec = {}, {}
+    spec, db_spec, object_storage_spec = {}, {}, {}
 
     if len(json_blocks) > 0:
         try:
