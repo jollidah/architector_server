@@ -192,6 +192,7 @@ CommandUnion = Annotated[
 # 최종 요청 스키마
 class CommandRequest(BaseModel):
     command_list: List[CommandUnion]
+    description: str
 
 class FinalArchitectureResponse(BaseModel):
     rec1: CommandRequest

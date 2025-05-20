@@ -3,7 +3,7 @@ import re
 from langchain_core.output_parsers import StrOutputParser, JsonOutputParser
 from langchain_openai import ChatOpenAI
 from app.core.config import OPENAI_API_KEY, INSTANCE_FAISS_PATH, INSTANCE_CSV_PATH, DB_FAISS_PATH, DB_CSV_PATH, OBJECT_STORAGE_FAISS_PATH, OBJECT_STORAGE_CSV_PATH
-from app.core.prompts import SPEC_RECOMMEND_PROMPT, INSTANCE_MATCH_PROMPT, DB_MATCH_PROMPT, ARCH_PROMPT, DIFF_PROMPT
+from app.core.prompts import SPEC_RECOMMEND_PROMPT, INSTANCE_MATCH_PROMPT, DB_MATCH_PROMPT, ARCH_PROMPT
 from app.services.retrieval import hybrid_retrieve, sparse_from_documents
 from app.services.document_loader import  load_faiss_db, load_documents_for_retrieval_instance, load_documents_for_retrieval_db, load_documents_for_retrieval_object_storage
 from typing import Dict, Any
@@ -168,7 +168,6 @@ def run_chain3(user_input: Dict[str, Any], llm1_result: dict, llm2_result: dict,
         "content": json.loads(doc.page_content)
     }, ensure_ascii=False) for doc in object_storage_context_docs]    
     
-    # print(context)
     recs = []
 
     for i in range(3):
@@ -192,12 +191,3 @@ def run_chain3(user_input: Dict[str, Any], llm1_result: dict, llm2_result: dict,
         rec2=recs[1],
         rec3=recs[2]
     )
-
-
-def run_chain4(rec_input):
-    chain = DIFF_PROMPT | llm | JsonOutputParser()
-    raw_response = chain.invoke({
-        "rec_input": rec_input
-    })
-    
-    return raw_response
