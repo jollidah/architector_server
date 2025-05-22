@@ -2,13 +2,6 @@ services:
   app:
     build: 
       context: .
-      args:
-        - INSTANCE_FAISS_PATH
-        - INSTANCE_CSV_PATH
-        - DB_FAISS_PATH
-        - DB_CSV_PATH
-        - OBJECT_STORAGE_FAISS_PATH
-        - OBJECT_STORAGE_CSV_PATH
     ports:
       - "8000:8000"
     volumes:
