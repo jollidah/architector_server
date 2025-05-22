@@ -7,7 +7,7 @@ from app.core.prompts import SPEC_RECOMMEND_PROMPT, INSTANCE_MATCH_PROMPT, DB_MA
 from app.services.retrieval import hybrid_retrieve, sparse_from_documents
 from app.services.document_loader import  load_faiss_db, load_documents_for_retrieval_instance, load_documents_for_retrieval_db, load_documents_for_retrieval_object_storage
 from typing import Dict, Any
-from app.models.schemas import FinalArchitectureResponse, CommandRequest
+from app.models.schemas import FinalArchitectureResponse
 
 
 llm = ChatOpenAI(model="gpt-4-turbo", temperature=0.7, api_key=OPENAI_API_KEY)
@@ -182,9 +182,9 @@ def run_chain3(user_input: Dict[str, Any], llm1_result: dict, llm2_result: dict,
             "user_location": location,
             "llm2_result": llm2_subset
         })
-
-        rec = CommandRequest(**raw_response)
-        recs.append(rec)
+        
+        print(raw_response)
+        recs.append(raw_response)
 
     return FinalArchitectureResponse(
         rec1=recs[0],

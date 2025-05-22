@@ -108,17 +108,18 @@ Specifically:
 - **Use the TOOL below to configure OUTPUT FORMAT**
 - Please create as many object_storage and block_storage as you need. It doesn't have to be there, and if you don't need it, you don't have to create it.
 - Instances that enter a firewall group must perform UpdateInstance at the end. You don't have to do any instances that don't have to go into the firewall.
-- command_list must have command_name, tmp_id, data
 - Please refer to EXAMPLE and organize OUTPUT FORMAT
-- command_name uses the command_name in the TOOL below
-- **Add tmp_id only to the command_name "CreateInstance", "CreateBlockStorage", "CreateFirewallGroup", "CreateManagedDatabase", and "CreateObjectStorage". Must have tmp_id.**.
-- If object_storage is required, view OBJECT_STORAGE_SPEC and fill "CreateObjectStorage".
 - Choose the location of object storage according to the USER_LOCATION, and if there is no same location, choose the nearest location.
 - ObjectStorage and Block Storage are only put in when needed.
 - Only one instance can be attached to one block storage.
+- resource_type must be used in ResourceType.
+- **The every details of the things in TOOL should go in**
+
 
 We also review the architecture and output a single-line summary evaluation from an instance and architecture perspective.
 "The description requires a one-line summary evaluation for each architecture."
+
+**Without additional explanation**
 
 
 OBJECT_STORAGE_SPEC:
@@ -135,231 +136,210 @@ LLM2_RESULT:
 
 OUTPUT FORMAT:
 {{
-    "command_list": [
-        {{
-            "command_name": "...",
-            "temp_id": "...",
-            "data": {{
-            }}
+  "architecture": [
+      {{
+        "temp_id": "string",
+        "resource_type": ResourceType,
+        "position": {{
+          "y": 0,
+          "x": 0
+        }},
+        "attributes": {{
+          "..."
         }}
+      }}
     ],
-    "description": "..."
+    "description": "string"
+}}
+
+enum ResourceType {{
+    BlockStorage,
+    Compute,
+    ManagedDatabase,
+    ObjectStorage,
+    FirewallGroup,
+    FirewallRule,
 }}
 
 TOOL:
-command_name: CreateInstance
-data: {{
-    region: String,
-    plan: String,
-    label: String,
-    os_id: i64,
-    backups: BackupStatus,
-    hostname: String
+BlockStorageAttributes:
+{{
+    #[serde(skip_deserializing)]
+    region_id: str, // e.g."ewr"
+    id: str,
+    mount_id: str,
+    attached_to_instance: str,
+    size_gb: int,
+    label: str,
 }}
-enum BackupStatus {{
-    enabled,
-    disabled
+
+-------------------------------
+FirewallGroupAttributes:
+{{
+    id: str
+    description: str
 }}
------------------------------
-command_name: UpdateInstance
-data: {{
-    id: tmp_id,
-    backups: BackupStatus,
-    firewall_group_id: String,
-    os_id: i64,
-    plan: String,
-    ddos_protection: bool,
-    label: String
+-------------------------------
+FirewallRuleAttributes:
+{{
+    id: str
+    action: str
+    port: str
+    ip_type: str
+    protocol: str
+    subnet: str
+    subnet_size: int
+    notes: str
 }}
------------------------------
-command_name: CreateBlockStorage
-data: {{
-    region: String,
-    size_gb: i64, // New size of the Block Storage in GB. Size may range between 10 and 40000 depending on the block_type
-    label: String
-}}
------------------------------
-command_name: UpdateBlockStorage
-data: {{
-    id: tmp_id,
-    size_gb: i64, // New size of the Block Storage in GB. Size may range between 10 and 40000 depending on the block_type
-    label: String
-}}
------------------------------
-command_name: AttachBlockStorageToInstance
-data: {{
-  id: tmp_id
-  instance_id: tmp_id
-  live: bool 
-}}
-What 'live: true' means is that it does not restart instance.
------------------------------
-command_name: CreateFirewallGroup
-data: {{
-    description: String
-}}
------------------------------
-command_name: UpdateFirewallGroup
-data: {{
-    id: tmp_id,
-    description: String
-}}
------------------------------
-command_name: CreateFirewallRule
-data: {{
-    fire_wall_group_id: tmp_id,
-    ip_type: IpType,
-    protocol: Protocol,
-    port: String,
-    subnet: String,     // e.g. "192.0.2.0"
-    subnet_size: i64,
-    notes: String
-}}
+-------------------------------
 enum IpType {{
     v4,
-    v6
+    v6,
 }}
+-------------------------------
 enum Protocol {{
     icmp,
     tcp,
     udp,
     gre,
     esp,
-    ah
+    ah,
 }}
------------------------------
-command_name: CreateManagedDatabase
-data: {{
-    database_engine: DatabaseEngine,
-    database_engine_version: i64,
-    region: String,
-    plan: String,
-    label: String
+-------------------------------
+ComputeAttributes:
+{{
+    region_id: str
+    auto_backups: BackupStatus
+    id: str
+    plan: str
+    status: str
+    main_ip: str
+    label: str
+    os_id: int
+    firewall_group_id: str
 }}
-enum DatabaseEngine {{
-    mysql,
-    pg
+-------------------------------
+enum BackupStatus {{
+    enabled,
+    disabled,
 }}
+-------------------------------
+ManagedDatabaseAttributes:
+{{
+    region_id: str
+    id: str
+    status: str
+    plan: str
+    database_engine: str
+    database_engine_version: int
+    latest_backup: str
+    label: str
+}}
+-------------------------------
 The version of the chosen database engine type for the Managed Database.
 MySQL: 8
 PostgreSQL: 16
------------------------------
-command_name: UpdateManagedDatabase
-data: {{
-    id: tmp_id,
-    plan: String,
-    label: String
-}}
------------------------------
-command_name: CreateObjectStorage
-data: {{
-    cluster_id: i64,
-    tier_id: i64,
-    label: String
-}}
------------------------------
-command_name: UpdateObjectStorage
-data: {{
-    id: tmp_id,
-    label: String
+
+enum DatabaseEngine {{
+    mysql,
+    pg,
 }}
 
-Example:
-    "command_list": [
-      {{
-        "command_name": "CreateInstance",
-        "tmp_id": instnace1,
-        "data": {{
-          "region": "ewr",
-          "plan": "voc-c-4c-8gb-75s-amd",
-          "label": "game-server-1",
-          "os_id": 1743,,
-          "backups": "disabled",
-          "hostname": "game1"
-        }}
-      }},
-      {{
-        "command_name": "CreateManagedDatabase",
-        "tmp_id": db1,
-        "data": {{
-          "database_engine": "pg",
-          "database_engine_version": 17,
-          "region": "ewr",
-          "plan": "vultr-dbaas-startup-cc-hp-intel-2-128-4",
-          "label": "game-db-1"
-        }}
-      }},
-      {{
-        "command_name": "CreateBlockStorage",
-        "tmp_id": blockstorage1
-        "data": {{
-          "region": "ewr",
-          "size_gb": 1000,
-          "label": "game-storage-1"
-        }}
-      }},
-      {{
-        "command_name": "AttachBlockStorageToInstance",
-        "data": {{
-          "id": tmp_id,
-          "instance_id": tmp_id,
-          "live": true
-        }}
-      }},
-      {{
-        "command_name": "CreateObjectStorage",
-        "tmp_id": objectstorage11
-        "data": {{
-          "cluster_id": 1,
-          "tier_id": 1,
-          "label": "game-object-storage-1"
-        }}
-      }},
-      {{
-        "command_name": "CreateFirewallGroup",
-        "tmp_id": firewall1
-        "data": {{
-          "description": "Game Server Firewall"
-        }}
-      }},
-      {{
-        "command_name": "CreateFirewallRule",
-        "data": {{
-          "fire_wall_group_id": tmp_id,
-          "ip_type": "v4",
-          "protocol": "tcp",
-          "port": "80",
-          "subnet": "192.168.0.0",
-          "subnet_size": 24,
-          "notes": "Allow HTTP traffic"
-        }}
-      }},
-      {{
-        "command_name": "CreateFirewallRule",
-        "data": {{
-          "fire_wall_group_id": tmp_id,
-          "ip_type": "v4",
-          "protocol": "tcp",
-          "port": "443",
-          "subnet": "192.168.0.0",
-          "subnet_size": 24,
-          "notes": "Allow HTTPS traffic"
-        }}
-      }},
-      {{
-        "command_name": "UpdateInstance",
-        "data": {{
-          "id": tmp_id,
-          "backups": "...",
-          "firewall_group_id": tmp_id,
-          "os_id": 1743,
-          "plan": "voc-c-4c-8gb-75s-amd",
-          "ddos_protection": true,
-          "label": "game-server-1"
-        }}
+-------------------------------
+ObjectStorageAttributes:
+{{
+    tier_id: int
+    id: str
+    cluster_id: int
+    label: str
+}}
+
+-------------------------------
+
+EXAMPLE:
+{{
+  "architecture": [
+    {{
+      "temp_id": "instance-1",
+      "resource_type": "Compute",
+      "position": {{ "y": 200 , "x": 100 }},
+      "attributes": {{
+        "region_id": "ewr",
+        "auto_backups": "disabled",
+        "id": "uuid-instance-1",
+        "plan": "voc-g-8c-32gb-160s-amd",
+        "status": "active",
+        "main_ip": "192.168.1.1",
+        "label": "Game Server Instance",
+        "os_id": 1743,
+        "firewall_group_id": "uuid-firewall-group-1"
       }}
-    ]
-  }}
+    }},
+    {{
+      "temp_id": "managed_db-1",
+      "resource_type": "ManagedDatabase",
+      "position": {{ "y": 200, "x": 300 }},
+      "attributes": {{
+        "region_id": "ewr",
+        "id": "uuid-db-1",
+        "status": "active",
+        "plan": "vultr-dbaas-premium-occ-so-24-3840-192",
+        "database_engine": "mysql",
+        "database_engine_version": 8,
+        "latest_backup": "2023-03-15",
+        "label": "Game Database"
+      }}
+    }},
+    {{
+      "temp_id": "object_storage-1",
+      "resource_type": "ObjectStorage",
+      "position": {{ "y": 100, "x": 200 }},
+      "attributes": {{
+        "tier_id": 5,
+        "id": "uuid-object-storage-1",
+        "cluster_id": 9,
+        "label": "Game Assets Storage",
+      }}
+    }},
+    {{
+      "temp_id": "block_storage-1",
+      "resource_type": "BlockStorage",
+      "position": {{ "y": 250, "x": 250 }},
+      "attributes": {{
+        "region_id": "ewr",
+        "mount_id": "uuid-mount-1",
+        "attached_to_instance": "uuid-instance-1",
+        "size_gb": 100,
+        "id": "uuid-block-storage-1",
+        "label": "Game Block Storage",
+      }}
+    }},
+    {{
+      "temp_id": "firewall_group-1",
+      "resource_type": "FirewallGroup",
+      "position": {{ "y": 250, "x": 50 }},
+      "attributes": {{
+        "id": "uuid-firewall-group-1",
+        "description": "Firewall for Game Services"
+      }}
+    }},
+    {{
+      "temp_id": "firewall_rule-1",
+      "resource_type": "FirewallRule",
+      "position": {{ "y": 275, "x": 75 }},
+      "attributes": {{
+        "action": "allow",
+        "port": "80",
+        "ip_type": "ipv4",
+        "protocol": "tcp",
+        "subnet": "192.168.1.0",
+        "subnet_size": 24,
+        "notes": "Allow HTTP traffic"
+      }}
+    }}
+  ],
+  "description": "The architecture provides a high-performance compute instance for real-time game processing, a managed database for storage needs, and object storage in the nearest available region. A dedicated firewall group enhances security."
+}}
 
 
 Helpful Answer:

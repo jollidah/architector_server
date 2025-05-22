@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 from app.core.llm import run_chain1, run_chain2, run_chain3
-from app.models.schemas import UserInput, FinalArchitectureResponse, EvalRecommandedArchitecture
+from app.models.schemas import UserInput, FinalArchitectureResponse
 
 router = APIRouter()
 

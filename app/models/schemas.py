@@ -1,7 +1,8 @@
-from pydantic import BaseModel, Field
-from typing import List, Union, Literal, Annotated
+from pydantic import BaseModel
+from typing import List, Union, Literal
 from enum import Enum
 
+# ===== 사용자 입력 =====
 class InstanceRequirements(BaseModel):
     target_stability: str
     anticipated_rps: int
@@ -14,18 +15,22 @@ class UserInput(BaseModel):
     additional_requirements: str
     instance_requirements: List[InstanceRequirements]
 
-class ArchitectureItem(BaseModel):
-    description: str
+# ===== Enums =====
+class ResourceType(str, Enum):
+    block_storage = "BlockStorage"
+    compute = "Compute"
+    managed_database = "ManagedDatabase"
+    object_storage = "ObjectStorage"
+    firewall_group = "FirewallGroup"
+    firewall_rule = "FirewallRule"
 
-class EvalRecommandedArchitecture(BaseModel):
-    rec1: ArchitectureItem
-    rec2: ArchitectureItem
-    rec3: ArchitectureItem
-
-# ENUM 정의
 class BackupStatus(str, Enum):
     enabled = "enabled"
     disabled = "disabled"
+
+class DatabaseEngine(str, Enum):
+    mysql = "mysql"
+    pg = "pg"
 
 class IpType(str, Enum):
     v4 = "v4"
@@ -39,162 +44,110 @@ class Protocol(str, Enum):
     esp = "esp"
     ah = "ah"
 
-class DatabaseEngine(str, Enum):
-    mysql = "mysql"
-    pg = "pg"
+class Position(BaseModel):
+    y: int
+    x: int
 
+# ===== 리소스 별 Attributes =====
+class BlockStorageAttributes(BaseModel):
+    region_id: str
+    id: str
+    mount_id: str
+    attached_to_instance: str
+    size_gb: int
+    label: str
 
-# 각 Command의 data 스키마 정의
-class CreateInstanceData(BaseModel):
-    region: str
+class ComputeAttributes(BaseModel):
+    region_id: str
+    auto_backups: BackupStatus
+    id: str
     plan: str
+    status: str
+    main_ip: str
     label: str
     os_id: int
-    backups: BackupStatus
-    hostname: str
-
-class UpdateInstanceData(BaseModel):
-    id: str
-    backups: BackupStatus
     firewall_group_id: str
-    os_id: int
+
+class ManagedDatabaseAttributes(BaseModel):
+    region_id: str
+    id: str
+    status: str
     plan: str
-    ddos_protection: bool
+    database_engine: str
+    database_engine_version: int
+    latest_backup: str
     label: str
 
-class CreateBlockStorageData(BaseModel):
-    region: str
-    size_gb: int
-    label: str
-
-class UpdateBlockStorageData(BaseModel):
+class ObjectStorageAttributes(BaseModel):
+    tier_id: int
     id: str
-    size_gb: int
+    cluster_id: int
     label: str
-    
-class AttachBlockStorageToInstance(BaseModel):
-  id: str
-  instance_id: str
-  live: bool 
 
-class CreateFirewallGroupData(BaseModel):
-    description: str
-
-class UpdateFirewallGroupData(BaseModel):
+class FirewallGroupAttributes(BaseModel):
     id: str
     description: str
 
-class CreateFirewallRuleData(BaseModel):
-    fire_wall_group_id: str
-    ip_type: IpType
-    protocol: Protocol
+class FirewallRuleAttributes(BaseModel):
+    id: str
+    action: str
     port: str
+    ip_type: str
+    protocol: str
     subnet: str
     subnet_size: int
     notes: str
 
-class CreateManagedDatabaseData(BaseModel):
-    database_engine: DatabaseEngine
-    database_engine_version: int
-    region: str
-    plan: str
-    label: str
+class BlockStorageResource(BaseModel):
+    temp_id: str
+    resource_type: Literal["BlockStorage"]
+    position: Position
+    attributes: BlockStorageAttributes
 
-class UpdateManagedDatabaseData(BaseModel):
-    id: str
-    plan: str
-    label: str
+class ComputeResource(BaseModel):
+    temp_id: str
+    resource_type: Literal["Compute"]
+    position: Position
+    attributes: ComputeAttributes
 
-class CreateObjectStorageData(BaseModel):
-    cluster_id: int
-    tier_id: int
-    label: str
+class ManagedDatabaseResource(BaseModel):
+    temp_id: str
+    resource_type: Literal["ManagedDatabase"]
+    position: Position
+    attributes: ManagedDatabaseAttributes
 
-class UpdateObjectStorageData(BaseModel):
-    id: str
-    label: str
+class ObjectStorageResource(BaseModel):
+    temp_id: str
+    resource_type: Literal["ObjectStorage"]
+    position: Position
+    attributes: ObjectStorageAttributes
 
-# Discriminated Union으로 command_name 구분
-class CreateInstance(BaseModel):
-    command_name: Literal["CreateInstance"]
-    tmp_id: str
-    data: CreateInstanceData
+class FirewallGroupResource(BaseModel):
+    temp_id: str
+    resource_type: Literal["FirewallGroup"]
+    position: Position
+    attributes: FirewallGroupAttributes
 
-class UpdateInstance(BaseModel):
-    command_name: Literal["UpdateInstance"]
-    data: UpdateInstanceData
+class FirewallRuleResource(BaseModel):
+    temp_id: str
+    resource_type: Literal["FirewallRule"]
+    position: Position
+    attributes: FirewallRuleAttributes
 
-class CreateBlockStorage(BaseModel):
-    command_name: Literal["CreateBlockStorage"]
-    tmp_id: str
-    data: CreateBlockStorageData
-
-class UpdateBlockStorage(BaseModel):
-    command_name: Literal["UpdateBlockStorage"]
-    data: UpdateBlockStorageData
-
-class AttachBlockStorageToInstance(BaseModel):
-    command_name: Literal["AttachBlockStorageToInstance"]
-    data: AttachBlockStorageToInstance
-
-class CreateFirewallGroup(BaseModel):
-    command_name: Literal["CreateFirewallGroup"]
-    tmp_id: str
-    data: CreateFirewallGroupData
-
-class UpdateFirewallGroup(BaseModel):
-    command_name: Literal["UpdateFirewallGroup"]
-    data: UpdateFirewallGroupData
-
-class CreateFirewallRule(BaseModel):
-    command_name: Literal["CreateFirewallRule"]
-    data: CreateFirewallRuleData
-
-class CreateManagedDatabase(BaseModel):
-    command_name: Literal["CreateManagedDatabase"]
-    tmp_id: str
-    data: CreateManagedDatabaseData
-
-class UpdateManagedDatabase(BaseModel):
-    command_name: Literal["UpdateManagedDatabase"]
-    data: UpdateManagedDatabaseData
-
-class CreateObjectStorage(BaseModel):
-    command_name: Literal["CreateObjectStorage"]
-    tmp_id: str
-    data: CreateObjectStorageData
-
-class UpdateObjectStorage(BaseModel):
-    command_name: Literal["UpdateObjectStorage"]
-    data: UpdateObjectStorageData
-
-
-
-CommandUnion = Annotated[
-    Union[
-    CreateInstance,
-    UpdateInstance,
-    CreateBlockStorage,
-    UpdateBlockStorage,
-    AttachBlockStorageToInstance,
-    CreateFirewallGroup,
-    UpdateFirewallGroup,
-    CreateFirewallRule,
-    CreateManagedDatabase,
-    UpdateManagedDatabase,
-    CreateObjectStorage,
-    UpdateObjectStorage
-    ],
-    Field(discriminator='command_name')
+Resource = Union[
+    BlockStorageResource,
+    ComputeResource,
+    ManagedDatabaseResource,
+    ObjectStorageResource,
+    FirewallGroupResource,
+    FirewallRuleResource,
 ]
 
-
-# 최종 요청 스키마
-class CommandRequest(BaseModel):
-    command_list: List[CommandUnion]
+class ArchitectureRecommendation(BaseModel):
+    architecture: List[Resource]
     description: str
 
 class FinalArchitectureResponse(BaseModel):
-    rec1: CommandRequest
-    rec2: CommandRequest
-    rec3: CommandRequest
+    rec1: ArchitectureRecommendation
+    rec2: ArchitectureRecommendation
+    rec3: ArchitectureRecommendation
