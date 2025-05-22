@@ -1,0 +1,12 @@
+fastapi
+uvicorn
+langchain_core
+langchain_openai
+python-dotenv
+langchain_community
+pandas
+openai
+faiss-cpu
+pydantic
+starlette
+rank_bm25
