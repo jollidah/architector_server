@@ -4,9 +4,9 @@ import os
 load_dotenv()
 
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-INSTANCE_FAISS_PATH = os.getenv("INSTANCE_FAISS_PATH")
-INSTANCE_CSV_PATH = os.getenv("INSTANCE_CSV_PATH")
-DB_FAISS_PATH = os.getenv("DB_FAISS_PATH")
-DB_CSV_PATH = os.getenv("DB_CSV_PATH")
-OBJECT_STORAGE_FAISS_PATH = os.getenv("OBJECT_STORAGE_FAISS_PATH")
-OBJECT_STORAGE_CSV_PATH = os.getenv("OBJECT_STORAGE_CSV_PATH")
+INSTANCE_FAISS_PATH = "data/faiss_db/vultr/instance"
+INSTANCE_CSV_PATH = "data/faiss_db/vultr/vultr_filtered_plans.csv"
+DB_FAISS_PATH = "data/faiss_db/vultr/db"
+DB_CSV_PATH = "data/faiss_db/vultr/Filtered_DBaaS_Plans.csv"
+OBJECT_STORAGE_FAISS_PATH = "data/faiss_db/vultr/object_storage"
+OBJECT_STORAGE_CSV_PATH = "data/faiss_db/vultr/cluster_tier_mappings_with_city.csv"
