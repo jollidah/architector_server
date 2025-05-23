@@ -114,7 +114,7 @@ Specifically:
 - Only one instance can be attached to one block storage.
 - resource_type must be used in ResourceType.
 - **The every details of the things in TOOL should go in**
-- **On the grid from 300 to 1100 on the X-axis and 80 to 700 on the Y-axis, the nodes are gui. The size of the node is 60x60. I'm going to divide the layers by node type. It's FirewallGroup on the top, FirewallRule on Compute, then BlockStorage, then Database and then ObjectStorage. The distance between the nodes should be at least 64 apart. Not unconditionally, but at least. And please set the position properly so that it looks pretty in the center of the grid.**.
+- **On the grid from 300 to 1100 on the X-axis and 80 to 700 on the Y-axis, the nodes are gui. The size of the node is 60x60. I'm going to divide the layers by node type. It's FirewallGroup on the top, FirewallRule on Compute, then BlockStorage, then Database and then ObjectStorage. The distance between nodes must be at least 100 up and down, and at least 64 on either side. Not unconditionally, but at least. And please set the position properly so that it looks pretty in the center of the grid.**.
 
 We also review the architecture and output a single-line summary evaluation from an instance and architecture perspective.
 "The description requires a one-line summary evaluation for each architecture."
