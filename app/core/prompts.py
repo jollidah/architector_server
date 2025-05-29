@@ -138,19 +138,19 @@ LLM2_RESULT:
 OUTPUT FORMAT:
 {{
   "architecture": [
-      {{
-        "temp_id": "string",
-        "resource_type": ResourceType,
-        "position": {{
-          "y": 0,
-          "x": 0
-        }},
-        "attributes": {{
-          "..."
-        }}
+    {{
+      "temp_id": "string",
+      "resource_type": ResourceType,
+      "position": {{
+        "y": 0,
+        "x": 0
+      }},
+      "attributes": {{
+        "..."
       }}
-    ],
-    "description": "string"
+    }}
+  ],
+  description: "..."
 }}
 
 enum ResourceType {{
