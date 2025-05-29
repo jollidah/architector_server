@@ -117,10 +117,12 @@ Specifically:
 - "id" must be an empty string
 - **On the grid from 300 to 1100 on the X-axis and 80 to 700 on the Y-axis, the nodes are gui. The size of the node is 60x60. I'm going to divide the layers by node type. It's FirewallGroup on the top, FirewallRule on Compute, then BlockStorage, then Database and then ObjectStorage. The distance between nodes must be at least 100 up and down, and at least 64 on either side. Not unconditionally, but at least. And please set the position properly so that it looks pretty in the center of the grid.**.
 
+
 We also review the architecture and output a single-line summary evaluation from an instance and architecture perspective.
 "The description requires a one-line summary evaluation for each architecture."
 
 **Without additional explanation**
+**There should be no annotation in the output**
 
 
 OBJECT_STORAGE_SPEC:
@@ -165,8 +167,7 @@ enum ResourceType {{
 TOOL:
 BlockStorageAttributes:
 {{
-    #[serde(skip_deserializing)]
-    region_id: str, // e.g."ewr"
+    region_id: str,
     id: "",
     mount_id: str,
     attached_to_instance: str,
@@ -273,7 +274,7 @@ EXAMPLE:
         "main_ip": "192.168.1.1",
         "label": "Game Server Instance",
         "os_id": 1743,
-        "firewall_group_id": "uuid-firewall-group-1"
+        "firewall_group_id": temp_id
       }}
     }},
     {{
@@ -287,7 +288,7 @@ EXAMPLE:
         "plan": "vultr-dbaas-premium-occ-so-24-3840-192",
         "database_engine": "mysql",
         "database_engine_version": 8,
-        "latest_backup": "2023-03-15",
+        "latest_backup": "2025-05-30",
         "label": "Game Database"
       }}
     }},
@@ -309,7 +310,7 @@ EXAMPLE:
       "attributes": {{
         "region_id": "ewr",
         "mount_id": "uuid-mount-1",
-        "attached_to_instance": "uuid-instance-1",
+        "attached_to_instance": temp_id,
         "size_gb": 100,
         "id": "",
         "label": "Game Block Storage",
