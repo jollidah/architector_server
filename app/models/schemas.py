@@ -148,6 +148,4 @@ class ArchitectureRecommendation(BaseModel):
     description: str
 
 class FinalArchitectureResponse(BaseModel):
-    rec1: ArchitectureRecommendation
-    rec2: ArchitectureRecommendation
-    rec3: ArchitectureRecommendation
+    rec: List[ArchitectureRecommendation]

@@ -10,4 +10,4 @@ def recommend_multiple_architectures(req: UserInput):
     llm2_result = run_chain2(llm1_result, location=req.location)
     final_architecture = run_chain3(req.model_dump(), llm1_result, llm2_result, location=req.location)
 
-    return final_architecture
+    return FinalArchitectureResponse(rec=final_architecture)

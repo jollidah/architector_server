@@ -114,12 +114,15 @@ Specifically:
 - Only one instance can be attached to one block storage.
 - resource_type must be used in ResourceType.
 - **The every details of the things in TOOL should go in**
+- "id" must be an empty string
 - **On the grid from 300 to 1100 on the X-axis and 80 to 700 on the Y-axis, the nodes are gui. The size of the node is 60x60. I'm going to divide the layers by node type. It's FirewallGroup on the top, FirewallRule on Compute, then BlockStorage, then Database and then ObjectStorage. The distance between nodes must be at least 100 up and down, and at least 64 on either side. Not unconditionally, but at least. And please set the position properly so that it looks pretty in the center of the grid.**.
+
 
 We also review the architecture and output a single-line summary evaluation from an instance and architecture perspective.
 "The description requires a one-line summary evaluation for each architecture."
 
 **Without additional explanation**
+**There should be no annotation in the output**
 
 
 OBJECT_STORAGE_SPEC:
@@ -137,19 +140,19 @@ LLM2_RESULT:
 OUTPUT FORMAT:
 {{
   "architecture": [
-      {{
-        "temp_id": "string",
-        "resource_type": ResourceType,
-        "position": {{
-          "y": 0,
-          "x": 0
-        }},
-        "attributes": {{
-          "..."
-        }}
+    {{
+      "temp_id": "string",
+      "resource_type": ResourceType,
+      "position": {{
+        "y": 0,
+        "x": 0
+      }},
+      "attributes": {{
+        "..."
       }}
-    ],
-    "description": "string"
+    }}
+  ],
+  description: "..."
 }}
 
 enum ResourceType {{
@@ -164,9 +167,8 @@ enum ResourceType {{
 TOOL:
 BlockStorageAttributes:
 {{
-    #[serde(skip_deserializing)]
-    region_id: str, // e.g."ewr"
-    id: str,
+    region_id: str,
+    id: "",
     mount_id: str,
     attached_to_instance: str,
     size_gb: int,
@@ -176,13 +178,13 @@ BlockStorageAttributes:
 -------------------------------
 FirewallGroupAttributes:
 {{
-    id: str
+    id: ""
     description: str
 }}
 -------------------------------
 FirewallRuleAttributes:
 {{
-    id: str
+    id: ""
     action: str
     port: str
     ip_type: str
@@ -210,7 +212,7 @@ ComputeAttributes:
 {{
     region_id: str
     auto_backups: BackupStatus
-    id: str
+    id: temp_id
     plan: str
     status: str
     main_ip: str
@@ -227,7 +229,7 @@ enum BackupStatus {{
 ManagedDatabaseAttributes:
 {{
     region_id: str
-    id: str
+    id: ""
     status: str
     plan: str
     database_engine: str
@@ -249,7 +251,7 @@ enum DatabaseEngine {{
 ObjectStorageAttributes:
 {{
     tier_id: int
-    id: str
+    id: ""
     cluster_id: int
     label: str
 }}
@@ -266,13 +268,13 @@ EXAMPLE:
       "attributes": {{
         "region_id": "ewr",
         "auto_backups": "disabled",
-        "id": "uuid-instance-1",
+        "id": "",
         "plan": "voc-g-8c-32gb-160s-amd",
         "status": "active",
         "main_ip": "192.168.1.1",
         "label": "Game Server Instance",
         "os_id": 1743,
-        "firewall_group_id": "uuid-firewall-group-1"
+        "firewall_group_id": temp_id
       }}
     }},
     {{
@@ -281,12 +283,12 @@ EXAMPLE:
       "position": {{ "y": 200, "x": 300 }},
       "attributes": {{
         "region_id": "ewr",
-        "id": "uuid-db-1",
+        "id": "",
         "status": "active",
         "plan": "vultr-dbaas-premium-occ-so-24-3840-192",
         "database_engine": "mysql",
         "database_engine_version": 8,
-        "latest_backup": "2023-03-15",
+        "latest_backup": "2025-05-30",
         "label": "Game Database"
       }}
     }},
@@ -296,7 +298,7 @@ EXAMPLE:
       "position": {{ "y": 100, "x": 200 }},
       "attributes": {{
         "tier_id": 5,
-        "id": "uuid-object-storage-1",
+        "id": "object_storage-1",
         "cluster_id": 9,
         "label": "Game Assets Storage",
       }}
@@ -308,9 +310,9 @@ EXAMPLE:
       "attributes": {{
         "region_id": "ewr",
         "mount_id": "uuid-mount-1",
-        "attached_to_instance": "uuid-instance-1",
+        "attached_to_instance": temp_id,
         "size_gb": 100,
-        "id": "uuid-block-storage-1",
+        "id": "",
         "label": "Game Block Storage",
       }}
     }},
@@ -319,7 +321,7 @@ EXAMPLE:
       "resource_type": "FirewallGroup",
       "position": {{ "y": 250, "x": 50 }},
       "attributes": {{
-        "id": "uuid-firewall-group-1",
+        "id": "",
         "description": "Firewall for Game Services"
       }}
     }},

@@ -1,6 +1,6 @@
 from fastapi import FastAPI, Request
 from app.api.endpoints import router
-from fastapi.responses import JSONResponse
+from fastapi.responses import FileResponse, JSONResponse
 from fastapi import Request
 from fastapi.exceptions import RequestValidationError
 from starlette.exceptions import HTTPException as StarletteHTTPException
@@ -13,6 +13,10 @@ app.include_router(router)
 @app.get("/")
 def read_root():
     return {"Welcome to AutCloud Spec Recommender API"}
+
+@app.get("/favicon.ico")
+async def favicon():
+    return FileResponse("static/favicon.ico")
 
 @app.exception_handler(StarletteHTTPException)
 async def http_exception_handler(request: Request, exc: StarletteHTTPException):

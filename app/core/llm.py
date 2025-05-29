@@ -183,11 +183,7 @@ def run_chain3(user_input: Dict[str, Any], llm1_result: dict, llm2_result: dict,
             "llm2_result": llm2_subset
         })
         
-        print(raw_response)
+        # print(raw_response)
         recs.append(raw_response)
 
-    return FinalArchitectureResponse(
-        rec1=recs[0],
-        rec2=recs[1],
-        rec3=recs[2]
-    )
+    return recs
